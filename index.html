@@ -591,9 +591,7 @@ main {
 .card.purple-accent::before {
   background: linear-gradient(90deg, var(--purple), var(--accent));
 }
-.card.tg-accent::before {
-  background: linear-gradient(90deg, #229ED9, var(--accent2));
-}
+
 .card-title {
   font-size: 13px;
   font-weight: 800;
@@ -938,39 +936,7 @@ textarea {
   margin-top: 12px;
   font-family: var(--mono);
 }
-.tg-preview {
-  background: #090d16;
-  border: 1px solid rgba(34, 158, 217, 0.15);
-  border-radius: 14px;
-  padding: 20px;
-  font-family: var(--mono);
-  font-size: 12px;
-  color: #d1d5db;
-  line-height: 1.7;
-  white-space: pre-wrap;
-  word-break: break-word;
-  box-shadow: inset 0 2px 10px rgba(0,0,0,0.3);
-}
-.tg-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 14px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border);
-}
-.tg-icon {
-  font-size: 20px;
-}
-.tg-info {
-  font-size: 12px;
-  font-weight: 700;
-  color: #229ED9;
-}
-.tg-sub {
-  font-size: 11px;
-  color: var(--muted);
-}
+
 
 /* History Logs */
 .section-hdr {
@@ -1320,11 +1286,11 @@ tbody td {
     </div>
     <div class="lf">
       <div>
-        <label for="loginEmail">Email Tim</label>
+        <label for="loginEmail">Email</label>
         <input type="email" id="loginEmail" placeholder="nama@perusahaan.com" autocomplete="email">
       </div>
       <div>
-        <label for="loginPassword">Password Akses</label>
+        <label for="loginPassword">Password</label>
         <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
       </div>
       <div class="login-error" id="loginError">Email tidak terdaftar atau password salah.</div>
@@ -1332,7 +1298,7 @@ tbody td {
     </div>
     <div class="login-note">
       Khusus untuk anggota tim terdaftar.<br>
-      Tanyakan password dan email ke Leader/Admin.
+      Tanyakan password dan email ke Leader.
     </div>
     <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border);">
       <button class="header-btn" style="width:100%;" onclick="openSettingsModal()">⚙️ Konfigurasi URL API</button>
@@ -1363,7 +1329,7 @@ tbody td {
     <div class="hero">
       <div class="hero-label">Operation &amp; Service Squad</div>
       <h1>Sudah Pakai AI<br>Hari Ini Guys?</h1>
-      <p>Catat penggunaan kecerdasan buatan Anda setiap hari. Naikin efisiensi kerja, kembangkan karir, dan bagikan insight prompt produktif ke rekan setim.</p>
+      <p>Catat penggunaan AI setiap hari. Naikin efisiensi kerja, kembangkan karir, dan bagikan insight prompt produktif ke rekan setim.</p>
     </div>
     
     <div class="stats-bar">
@@ -1405,8 +1371,8 @@ tbody td {
           
           <div class="form-row">
             <div class="fg" style="margin-bottom:0">
-              <label for="iName">Nama Lengkap</label>
-              <input type="text" id="iName" placeholder="Masukkan nama lengkap Anda">
+              <label for="iName">Nama</label>
+              <input type="text" id="iName" placeholder="Masukkan Nama">
             </div>
             <div class="fg" style="margin-bottom:0">
               <label for="iTeam">Tim / Divisi</label>
@@ -1555,28 +1521,11 @@ tbody td {
           </div>
           <div class="analysis-meta" id="analysisMeta"></div>
           <div style="margin-top:12px;font-size:11px;color:var(--muted);line-height:1.7">
-            ⏰ Digenerate otomatis jam 16:00 WIB menggunakan Vertex AI Gemini, kemudian dikirim langsung ke saluran Telegram.
+            ⏰ Digenerate otomatis jam 16:00 WIB menggunakan AI
           </div>
         </div>
         
-        <!-- Telegram Preview -->
-        <div class="card tg-accent">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:10px">
-            <div class="card-title" style="margin-bottom:0">
-              <span class="card-title-icon">✈️</span>
-              <span>Preview Pesan Telegram</span>
-            </div>
-            <button class="header-btn" onclick="loadTelegramPreview()" style="font-size:11px; padding: 4px 8px;">↻ Refresh</button>
-          </div>
-          <div class="tg-header">
-            <div class="tg-icon">🤖</div>
-            <div>
-              <div class="tg-info">Operation &amp; Service Squad Bot</div>
-              <div class="tg-sub">Disiarkan otomatis jam 16:00 WIB</div>
-            </div>
-          </div>
-          <div class="tg-preview" id="tgPreview">Memuat pesan terakhir...</div>
-        </div>
+
       </div>
     </div>
   </main>
@@ -1785,7 +1734,6 @@ function initApp() {
     loadStats();
     loadLog();
     loadAnalysis();
-    loadTelegramPreview();
   });
 }
 
@@ -1881,21 +1829,13 @@ async function loadAnalysis() {
         .replace(/\n\n/g, '<br><br>')
         .replace(/\n/g, '<br>');
       document.getElementById('analysisMeta').textContent = `Dianalisa: ${d.date} · ${d.time} · Model: ${d.model || 'Gemini 2.5 Flash'}`;
+    } else if (d.status === 'error') {
+      el.innerHTML = `<div style="color:var(--red);font-size:13px;text-align:center;">⚠️ Server Error: ${d.message}</div>`;
     } else {
       el.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;">Belum ada analisa hari ini. Laporan dibuat otomatis setiap jam 16:00 WIB.</div>';
     }
   } catch(e) {
-    el.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;">Gagal memuat analisa harian.</div>';
-  }
-}
-
-async function loadTelegramPreview() {
-  const el = document.getElementById('tgPreview');
-  try {
-    const d = await apiFetch('?action=getLastTelegram');
-    el.textContent = d.text || 'Belum ada pesan Telegram yang tercatat hari ini.';
-  } catch(e) {
-    el.textContent = 'Gagal memuat preview pesan Telegram.';
+    el.innerHTML = `<div style="color:var(--red);font-size:13px;text-align:center;">⚠️ Error: ${e.message || e}</div>`;
   }
 }
 
