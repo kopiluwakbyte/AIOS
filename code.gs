@@ -103,7 +103,22 @@ function getSheet(name, headers, headerColor) {
 function sheetRows(name) {
  const ss = getSpreadsheet(); const sh = ss.getSheetByName(name);
  if (!sh || sh.getLastRow() < 2) return [];
- const vals = sh.getDataRange().getValues(); const hdrs = vals[0].map(h => String(h).trim());
+ const vals = sh.getDataRange().getValues();
+ let hdrs = vals[0].map(h => String(h).trim());
+ 
+ // Cek jika seluruh header kosong (seperti pada baris pertama spreadsheet user)
+ if (hdrs.every(h => h === "")) {
+  if (name === SHEETS.ANALYSIS) {
+   hdrs = ["Tanggal", "Jam", "Check-in", "Missing", "Model", "Analisa"];
+   sh.getRange(1, 1, 1, hdrs.length).setValues([hdrs]).setFontWeight("bold").setBackground("#1b5e20").setFontColor("#fff");
+  } else if (name === SHEETS.CHECKIN) {
+   hdrs = ["ID", "Tanggal", "Waktu", "Nama", "Tim", "AI Tool", "Prompt", "Kategori", "Streak", "Login Email"];
+   sh.getRange(1, 1, 1, hdrs.length).setValues([hdrs]).setFontWeight("bold").setBackground("#1a237e").setFontColor("#fff");
+  } else if (name === SHEETS.TG_LOG) {
+   hdrs = ["Tanggal", "Jam", "Pesan", "Status", "Chat ID"];
+   sh.getRange(1, 1, 1, hdrs.length).setValues([hdrs]).setFontWeight("bold").setBackground("#0d47a1").setFontColor("#fff");
+  }
+ }
  return vals.slice(1).map(row => { const o = {}; hdrs.forEach((h,i) => o[h] = row[i]); return o; });
 }
 
