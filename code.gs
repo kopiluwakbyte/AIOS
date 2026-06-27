@@ -6,7 +6,7 @@ const CONFIG = {
  GCP_PROJECT_ID: scriptProps.getProperty("GCP_PROJECT_ID") || "",
  VERTEX_REGION: scriptProps.getProperty("VERTEX_REGION") || "",
  VERTEX_MODEL: scriptProps.getProperty("VERTEX_MODEL") || "",
- SHARED_PASSWORD: scriptProps.getProperty("SHARED_PASSWORD") || "kopi@2026",
+ SHARED_PASSWORD: scriptProps.getProperty("SHARED_PASSWORD") || "",
  
  // Mengambil daftar anggota tim secara dinamis dari Properti Skrip
  get TEAM_MEMBERS() {
