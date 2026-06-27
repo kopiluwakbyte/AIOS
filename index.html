@@ -376,6 +376,9 @@ header {
   letter-spacing: -0.02em;
   white-space: nowrap;
 }
+.logo-text-short {
+  display: none;
+}
 .logo-icon {
   width: 36px;
   height: 36px;
@@ -1335,6 +1338,20 @@ tbody td {
   tbody td, thead th {
     padding: 10px 12px;
   }
+  .user-chip span {
+    display: none;
+  }
+}
+@media (max-width: 600px) {
+  .logo-text-full {
+    display: none;
+  }
+  .logo-text-short {
+    display: inline;
+  }
+  .live-badge {
+    display: none;
+  }
 }
 </style>
 </head>
@@ -1408,7 +1425,8 @@ tbody td {
   <header>
     <div class="logo">
       <div class="logo-icon">🤖</div>
-      <span>AI Daily Check-in</span>
+      <span class="logo-text-full">AI Daily Check-in</span>
+      <span class="logo-text-short">AIOS</span>
       <span class="live-badge">LIVE</span>
     </div>
     <div class="hright">
