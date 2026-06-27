@@ -880,7 +880,9 @@ textarea {
   margin-top: 1px;
 }
 .lb-bar-wrap {
-  width: 90px;
+  flex: 1;
+  max-width: 120px;
+  min-width: 30px;
   height: 5px;
   background: rgba(255, 255, 255, 0.04);
   border-radius: 3px;
@@ -990,6 +992,8 @@ textarea {
 }
 .tbl-wrap {
   overflow-x: auto;
+  width: 100%;
+  max-width: 100%;
   border-radius: 14px;
   border: 1px solid var(--border);
   background: rgba(0, 0, 0, 0.15);
@@ -1235,6 +1239,101 @@ tbody td {
   }
   .wizard-input-wrapper {
     flex-direction: column;
+  }
+}
+@media (max-width: 480px) {
+  header {
+    padding: 10px 14px;
+    gap: 8px;
+  }
+  .logo {
+    font-size: 15px;
+    gap: 6px;
+  }
+  .logo-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+  }
+  .live-badge {
+    font-size: 8px;
+    padding: 1px 5px;
+    letter-spacing: 0.02em;
+  }
+  .hright {
+    gap: 6px;
+  }
+  .user-chip {
+    padding: 4px 8px;
+    font-size: 11px;
+    gap: 4px;
+  }
+  .udot {
+    width: 6px;
+    height: 6px;
+  }
+  .header-btn {
+    padding: 4px 6px;
+    font-size: 11px;
+  }
+  main {
+    padding: 12px 8px;
+  }
+  .hero {
+    padding: 12px 0 20px;
+  }
+  .hero h1 {
+    font-size: 24px;
+    line-height: 1.2;
+  }
+  .hero p {
+    font-size: 13px;
+  }
+  .stats-bar {
+    gap: 8px;
+  }
+  .stat-card {
+    padding: 12px 6px;
+  }
+  .stat-num {
+    font-size: 20px;
+  }
+  .stat-label {
+    font-size: 9px;
+    letter-spacing: 0.02em;
+    margin-top: 4px;
+  }
+  .stat-sub {
+    font-size: 9px;
+  }
+  .card {
+    padding: 16px 12px;
+    border-radius: 14px;
+    margin-bottom: 16px;
+  }
+  .missing-chip {
+    padding: 4px 10px;
+    font-size: 11px;
+  }
+  .login-box {
+    padding: 32px 24px;
+  }
+  .login-icon {
+    width: 58px;
+    height: 58px;
+    font-size: 28px;
+  }
+  .login-title {
+    font-size: 20px;
+  }
+  .lf input, .lf label {
+    font-size: 13px;
+  }
+  .tbl-wrap table {
+    font-size: 12px;
+  }
+  tbody td, thead th {
+    padding: 10px 12px;
   }
 }
 </style>
