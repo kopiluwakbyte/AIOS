@@ -1400,9 +1400,7 @@ tbody td {
 <div id="loginScreen">
   <div class="login-box animate-fade">
     <div class="login-logo">
-      <div class="login-icon">
-        <img src="icon.png" style="width:70%;height:70%;object-fit:contain;" alt="Logo">
-      </div>
+      <div class="login-icon">🤖</div>
       <div class="login-title">AI Daily Check-in</div>
       <div class="login-sub">Operation &amp; Service Squad</div>
     </div>
@@ -1420,7 +1418,6 @@ tbody td {
     </div>
     <div class="login-note">
       Khusus untuk anggota tim terdaftar.<br>
-      Tanyakan password dan email ke Leader
     </div>
 
   </div>
@@ -1430,9 +1427,7 @@ tbody td {
 <div id="appScreen">
   <header>
     <div class="logo">
-      <div class="logo-icon">
-        <img src="icon.png" style="width:70%;height:70%;object-fit:contain;" alt="Logo">
-      </div>
+      <div class="logo-icon">🤖</div>
       <span class="logo-text-full">AI Daily Check-in</span>
       <span class="logo-text-short">AIOS</span>
       <span class="live-badge">LIVE</span>
@@ -1582,9 +1577,7 @@ tbody td {
                 <tr>
                   <td colspan="7">
                     <div class="empty">
-                      <div class="eicon">
-                        <img src="icon.png" style="width:40px;height:40px;opacity:0.6;object-fit:contain;" alt="Logo">
-                      </div>
+                      <div class="eicon">🤖</div>
                       <p>Memuat data riwayat...</p>
                     </div>
                   </td>
@@ -2083,7 +2076,7 @@ function renderLog() {
     
   const tb = document.getElementById('logBody');
   if (!data.length) {
-    tb.innerHTML = `<tr><td colspan="7"><div class="empty"><div class="eicon"><img src="icon.png" style="width:40px;height:40px;opacity:0.6;object-fit:contain;" alt="Logo"></div><p>Belum ada data check-in terdaftar.</p></div></td></tr>`;
+    tb.innerHTML = `<tr><td colspan="7"><div class="empty"><div class="eicon">🤖</div><p>Belum ada data check-in terdaftar.</p></div></td></tr>`;
     return;
   }
   
