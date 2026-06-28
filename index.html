@@ -1688,8 +1688,41 @@ const CFG = {
   }
 };
 
-let entries = JSON.parse(localStorage.getItem('ai_ci_v3') || '[]');
-let members = JSON.parse(localStorage.getItem('ai_ci_members') || '[]');
+let entries = [];
+try {
+  const cachedEntries = JSON.parse(localStorage.getItem('ai_ci_v3') || '[]');
+  if (Array.isArray(cachedEntries)) {
+    entries = cachedEntries.map(e => ({
+      id: e.id || '',
+      date: String(e.date || ''),
+      time: String(e.time || ''),
+      name: String(e.name || ''),
+      team: String(e.team || ''),
+      tools: Array.isArray(e.tools) ? e.tools : [],
+      prompt: String(e.prompt || ''),
+      useCase: String(e.useCase || '-'),
+      streak: parseInt(e.streak) || 1,
+      by: String(e.by || '')
+    }));
+  }
+} catch(err) {
+  console.error('Gagal memuat cache entries:', err);
+}
+
+let members = [];
+try {
+  const cachedMembers = JSON.parse(localStorage.getItem('ai_ci_members') || '[]');
+  if (Array.isArray(cachedMembers)) {
+    members = cachedMembers.map(m => ({
+      email: String(m.email || ''),
+      name: String(m.name || ''),
+      team: String(m.team || '')
+    }));
+  }
+} catch(err) {
+  console.error('Gagal memuat cache members:', err);
+}
+
 let tools = [], filter = 'all', user = localStorage.getItem('ai_ci_user') || null, online = false;
 
 const today = () => {
@@ -1837,7 +1870,7 @@ document.addEventListener('keydown', e => {
 function showApp() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('appScreen').style.display = 'block';
-  document.getElementById('uChip').textContent = user.split('@')[0];
+  document.getElementById('uChip').textContent = String(user || '').split('@')[0];
   document.getElementById('hDate').textContent = new Date().toLocaleDateString('id-ID', {
     weekday: 'long',
     year: 'numeric',
@@ -1856,7 +1889,7 @@ function populateDatalist() {
 
 function autoFillSelf() {
   if (user && Array.isArray(members)) {
-    const found = members.find(m => m.email.toLowerCase() === user.toLowerCase());
+    const found = members.find(m => m.email && m.email.toLowerCase() === user.toLowerCase());
     if (found) {
       document.getElementById('iName').value = found.name;
       document.getElementById('iTeam').value = found.team;
