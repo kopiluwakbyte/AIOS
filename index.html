@@ -1490,7 +1490,8 @@ tbody td {
           <div class="form-row">
             <div class="fg" style="margin-bottom:0">
               <label for="iName">Nama</label>
-              <input type="text" id="iName" placeholder="Masukkan nama Anda">
+              <input type="text" id="iName" placeholder="Masukkan nama Anda" list="teamNames" autocomplete="off">
+              <datalist id="teamNames"></datalist>
             </div>
             <div class="fg" style="margin-bottom:0">
               <label for="iTeam">Tim / Divisi</label>
@@ -1846,15 +1847,46 @@ function showApp() {
   initApp();
 }
 
+function populateDatalist() {
+  const dl = document.getElementById('teamNames');
+  if (dl && Array.isArray(members)) {
+    dl.innerHTML = members.map(m => `<option value="${m.name}"></option>`).join('');
+  }
+}
+
+function autoFillSelf() {
+  if (user && Array.isArray(members)) {
+    const found = members.find(m => m.email.toLowerCase() === user.toLowerCase());
+    if (found) {
+      document.getElementById('iName').value = found.name;
+      document.getElementById('iTeam').value = found.team;
+    }
+  }
+}
+
 function initApp() {
   checkConn();
+  populateDatalist();
+  autoFillSelf();
+  
   loadMembers().then(() => {
+    populateDatalist();
+    autoFillSelf();
     renderLocal();
     loadStats();
     loadLog();
     loadAnalysis();
   });
 }
+
+// Auto-fill team selection based on selected name
+document.getElementById('iName').addEventListener('input', e => {
+  const val = e.target.value.trim().toLowerCase();
+  const found = members.find(m => m.name.toLowerCase() === val);
+  if (found) {
+    document.getElementById('iTeam').value = found.team;
+  }
+});
 
 // App Logic and Data Fetching
 async function checkConn() {
