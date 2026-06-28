@@ -1641,7 +1641,7 @@ tbody td {
           </div>
           <div class="analysis-meta" id="analysisMeta"></div>
           <div style="margin-top:12px;font-size:11px;color:var(--muted);line-height:1.7">
-            ⏰ Digenerate otomatis jam 16:00 WIB menggunakan AI Gemini
+            ⏰ Digenerate otomatis jam 16:00 WIB menggunakan AI
           </div>
         </div>
         
@@ -1864,19 +1864,72 @@ function autoFillSelf() {
   }
 }
 
-function initApp() {
+async function initApp() {
   checkConn();
   populateDatalist();
   autoFillSelf();
   
-  loadMembers().then(() => {
-    populateDatalist();
-    autoFillSelf();
-    renderLocal();
-    loadStats();
-    loadLog();
-    loadAnalysis();
-  });
+  // Tampilkan data lokal/cache secara instan
+  renderLocal();
+  renderLog();
+  renderLeaderboard();
+  
+  try {
+    const d = await apiFetch('?action=getInitialData&days=30');
+    if (d && d.status === 'ok') {
+      // 1. Members
+      if (Array.isArray(d.members)) {
+        members = d.members;
+        localStorage.setItem('ai_ci_members', JSON.stringify(members));
+        populateDatalist();
+        autoFillSelf();
+      }
+      
+      // 2. Entries
+      if (Array.isArray(d.entries)) {
+        entries = d.entries.map(r => ({
+          id: r['ID'] || '',
+          date: String(r['Tanggal'] || ''),
+          time: String(r['Waktu'] || ''),
+          name: r['Nama'] || '',
+          team: r['Tim'] || '',
+          tools: String(r['AI Tool'] || '').split(', ').filter(Boolean),
+          prompt: r['Prompt'] || '',
+          useCase: r['Kategori'] || '-',
+          streak: parseInt(r['Streak']) || 1,
+          by: r['Login Email'] || ''
+        }));
+        localStorage.setItem('ai_ci_v3', JSON.stringify(entries));
+      }
+      
+      // 3. Stats & Leaderboard
+      if (d.stats) {
+        renderStats(d.stats);
+      }
+      
+      // 4. Analysis
+      const el = document.getElementById('analysisBody');
+      const ana = d.analysis;
+      if (ana && ana.status === 'ok' && ana.text) {
+        el.innerHTML = ana.text
+          .replace(/## (.+)/g, '<h3>$1</h3>')
+          .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+          .replace(/^- /gm, '<br>• ')
+          .replace(/\n\n/g, '<br><br>')
+          .replace(/\n/g, '<br>');
+        document.getElementById('analysisMeta').textContent = `Dianalisa: ${ana.date} · ${ana.time} · Model: ${ana.model || 'Gemini 2.5 Flash'}`;
+      } else if (ana && ana.status === 'error') {
+        el.innerHTML = `<div style="color:var(--red);font-size:13px;text-align:center;">⚠️ Server Error: ${ana.message}</div>`;
+      } else {
+        el.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;">Belum ada analisa hari ini. Laporan dibuat otomatis setiap jam 16:00 WIB.</div>';
+      }
+      
+      renderLog();
+      renderLeaderboard();
+    }
+  } catch(e) {
+    console.error('Gagal sinkronisasi data dengan server:', e);
+  }
 }
 
 // Auto-fill team selection based on selected name
