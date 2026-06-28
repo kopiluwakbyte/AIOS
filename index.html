@@ -1926,9 +1926,17 @@ async function initApp() {
       
       renderLog();
       renderLeaderboard();
+    } else {
+      throw new Error((d && d.message) ? d.message : 'Server mengembalikan respons error.');
     }
   } catch(e) {
     console.error('Gagal sinkronisasi data dengan server:', e);
+    toast(`⚠️ Sinkronisasi server gagal: ${e.message || e}`, '#ef4444');
+    // Matikan loading di UI dengan merender ulang data lokal
+    renderLocal();
+    renderLog();
+    renderLeaderboard();
+    document.getElementById('analysisBody').innerHTML = `<div style="color:var(--red);font-size:13px;text-align:center;">⚠️ Gagal sinkronisasi: ${e.message || e}</div>`;
   }
 }
 
