@@ -50,7 +50,7 @@ body.light-mode {
   background: rgba(255, 255, 255, 0.6);
   color: var(--text);
 }
-.light-mode .wizard-input, .light-mode .lf input {
+.light-mode .wizard-input, .light-mode .lf input, .light-mode .search-input {
   background: rgba(255, 255, 255, 0.7);
 }
 .light-mode .step-item {
@@ -1060,7 +1060,25 @@ textarea {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+  align-items: center;
   margin-bottom: 16px;
+}
+.search-input {
+  padding: 6px 14px;
+  font-size: 12px;
+  border-radius: 20px;
+  width: 160px;
+  min-height: 0;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border);
+  color: var(--text);
+  outline: none;
+  transition: all 0.2s;
+  margin-left: auto;
+}
+.search-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 .filter-btn {
   background: rgba(255, 255, 255, 0.02);
@@ -1654,12 +1672,15 @@ tbody td {
           </div>
           
           <div class="filter-bar">
-            <button class="filter-btn active" onclick="setFilter('all',this)">Semua</button>
-            <button class="filter-btn" onclick="setFilter('today',this)">Hari Ini</button>
-            <button class="filter-btn" onclick="setFilter('Operator',this)">Operator</button>
-            <button class="filter-btn" onclick="setFilter('Customer Service',this)">Customer Service</button>
-            <button class="filter-btn" onclick="setFilter('Recon',this)">Recon</button>
-            <button class="filter-btn" onclick="setFilter('Logistik',this)">Logistik</button>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button class="filter-btn active" onclick="setFilter('all',this)">Semua</button>
+              <button class="filter-btn" onclick="setFilter('today',this)">Hari Ini</button>
+              <button class="filter-btn" onclick="setFilter('Operator',this)">Operator</button>
+              <button class="filter-btn" onclick="setFilter('Customer Service',this)">Customer Service</button>
+              <button class="filter-btn" onclick="setFilter('Recon',this)">Recon</button>
+              <button class="filter-btn" onclick="setFilter('Logistik',this)">Logistik</button>
+            </div>
+            <input type="text" id="searchName" class="search-input" placeholder="🔍 Cari nama..." oninput="handleSearch()">
           </div>
           
           <div class="tbl-wrap">
@@ -1686,28 +1707,6 @@ tbody td {
                 </tr>
               </tbody>
             </table>
-          </div>
-        </div>
-        
-        <!-- Status Tim -->
-        <div class="card purple-accent">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:10px">
-            <div class="card-title" style="margin-bottom:0">
-              <span class="card-title-icon">📊</span>
-              <span>Status Tim Hari Ini</span>
-            </div>
-            <button class="header-btn" onclick="loadStats()" style="font-size:11px; padding: 4px 8px;">↻ Refresh</button>
-          </div>
-          <div class="team-grid" id="teamGrid">
-            <div style="color:var(--muted);font-size:13px;grid-column:1/-1;padding:8px 0" class="loading-row">
-              <div class="spinner"></div> Memuat tim...
-            </div>
-          </div>
-          <div>
-            <div style="font-size:11px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px">⚠️ Belum Check-in</div>
-            <div class="missing-list" id="missingList">
-              <span style="color:var(--muted);font-size:13px">Menghubungkan...</span>
-            </div>
           </div>
         </div>
       </div>
@@ -1746,6 +1745,27 @@ tbody td {
           </div>
         </div>
         
+        <!-- Status Tim -->
+        <div class="card purple-accent">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:10px">
+            <div class="card-title" style="margin-bottom:0">
+              <span class="card-title-icon">📊</span>
+              <span>Status Tim Hari Ini</span>
+            </div>
+            <button class="header-btn" onclick="loadStats()" style="font-size:11px; padding: 4px 8px;">↻ Refresh</button>
+          </div>
+          <div class="team-grid" id="teamGrid">
+            <div style="color:var(--muted);font-size:13px;grid-column:1/-1;padding:8px 0" class="loading-row">
+              <div class="spinner"></div> Memuat tim...
+            </div>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px">⚠️ Belum Check-in</div>
+            <div class="missing-list" id="missingList">
+              <span style="color:var(--muted);font-size:13px">Menghubungkan...</span>
+            </div>
+          </div>
+        </div>
 
       </div>
     </div>
@@ -1825,6 +1845,7 @@ try {
 }
 
 let tools = [], filter = 'all', user = localStorage.getItem('ai_ci_user') || null, online = false;
+let searchQuery = '';
 let currentPage = 1;
 const rowsPerPage = 50;
 
@@ -2322,10 +2343,20 @@ function changePage(delta) {
   renderLog();
 }
 
+function handleSearch() {
+  searchQuery = document.getElementById('searchName').value.trim().toLowerCase();
+  currentPage = 1;
+  renderLog();
+}
+
 function renderLog() {
   let data = filter === 'today' ? 
     entries.filter(e => e.date === today()) : 
     filter !== 'all' ? entries.filter(e => e.team === filter) : entries;
+    
+  if (searchQuery) {
+    data = data.filter(e => String(e.name).toLowerCase().includes(searchQuery));
+  }
     
   const tb = document.getElementById('logBody');
   let pgControl = document.getElementById('paginationControl');
