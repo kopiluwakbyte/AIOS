@@ -105,8 +105,24 @@ body.light-mode {
   background: rgba(0, 0, 0, 0.08);
 }
 .light-mode .lb-rank.g2 { color: #94a3b8; }
+.light-mode .missing-chip {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #dc2626;
+}
 .light-mode .missing-chip .tt {
-  background: rgba(0, 0, 0, 0.08);
+  background: rgba(0, 0, 0, 0.05);
+  color: #991b1b;
+}
+.light-mode .hero h1 {
+  background: linear-gradient(135deg, #0f172a 30%, var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.light-mode .wizard-title, .light-mode .login-title {
+  background: linear-gradient(135deg, #0f172a 40%, var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 .pagination-control {
   display: flex;
