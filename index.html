@@ -30,6 +30,91 @@
   --glass-blur: blur(16px);
 }
 
+:root.light-mode {
+  --bg: #f4f6f8;
+  --surface: rgba(255, 255, 255, 0.85);
+  --surface-elevated: rgba(255, 255, 255, 0.98);
+  --border: rgba(0, 0, 0, 0.1);
+  --text: #0f172a;
+  --muted: #64748b;
+  --muted2: #475569;
+  --card-shadow: 0 12px 30px 0 rgba(0, 0, 0, 0.05);
+}
+body.light-mode {
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.08) 0px, transparent 40%),
+    radial-gradient(at 50% 0%, rgba(6, 182, 212, 0.08) 0px, transparent 40%),
+    radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.08) 0px, transparent 40%);
+}
+.light-mode input, .light-mode select, .light-mode textarea {
+  background: rgba(255, 255, 255, 0.6);
+  color: var(--text);
+}
+.light-mode .wizard-input, .light-mode .lf input {
+  background: rgba(255, 255, 255, 0.7);
+}
+.light-mode .step-item {
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+.light-mode .user-chip, .light-mode .header-btn, .light-mode .filter-btn, .light-mode .export-btn {
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--muted2);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+.light-mode .user-chip:hover, .light-mode .header-btn:hover, .light-mode .filter-btn:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: var(--text);
+}
+.light-mode .filter-btn.active {
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.light-mode header, .light-mode .card, .light-mode .wizard-box, .light-mode .login-box, .light-mode .modal {
+  background: var(--surface);
+}
+.light-mode .tbl-wrap {
+  background: rgba(255, 255, 255, 0.5);
+}
+.light-mode thead th {
+  background: rgba(0, 0, 0, 0.03);
+}
+.light-mode tbody tr:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+.light-mode .team-tile, .light-mode .lb-row:hover, .light-mode .pill {
+  background: rgba(0, 0, 0, 0.02);
+}
+.light-mode .team-tile:hover, .light-mode .pill:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+.light-mode .pill.active {
+  background: linear-gradient(135deg, var(--accent), #2563eb);
+  color: #fff;
+}
+.light-mode .analysis-body {
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+.light-mode select option {
+  background: #fff;
+  color: var(--text);
+}
+.light-mode .lb-bar-wrap, .light-mode .team-tile-bar {
+  background: rgba(0, 0, 0, 0.08);
+}
+.light-mode .lb-rank.g2 { color: #94a3b8; }
+.light-mode .missing-chip .tt {
+  background: rgba(0, 0, 0, 0.08);
+}
+.pagination-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 4px 0;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -1438,7 +1523,7 @@ tbody td {
         <div class="udot"></div>
         <span id="uChip"></span>
       </div>
-
+      <button class="header-btn" onclick="toggleTheme()" title="Ganti Tema (Dark/Light)">🌓</button>
       <button class="header-btn logout-btn" onclick="doLogout()">Keluar</button>
     </div>
   </header>
@@ -1724,6 +1809,26 @@ try {
 }
 
 let tools = [], filter = 'all', user = localStorage.getItem('ai_ci_user') || null, online = false;
+let currentPage = 1;
+const rowsPerPage = 50;
+
+function applyTheme() {
+  const t = localStorage.getItem('ai_ci_theme') || 'dark';
+  if (t === 'light') {
+    document.documentElement.classList.add('light-mode');
+    document.body.classList.add('light-mode');
+  } else {
+    document.documentElement.classList.remove('light-mode');
+    document.body.classList.remove('light-mode');
+  }
+}
+applyTheme();
+
+function toggleTheme() {
+  const isLight = document.documentElement.classList.contains('light-mode');
+  localStorage.setItem('ai_ci_theme', isLight ? 'dark' : 'light');
+  applyTheme();
+}
 
 const today = () => {
   const d = new Date();
@@ -2190,8 +2295,14 @@ function renderLocal() {
 
 function setFilter(val, el) {
   filter = val;
+  currentPage = 1;
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
+  renderLog();
+}
+
+function changePage(delta) {
+  currentPage += delta;
   renderLog();
 }
 
@@ -2201,12 +2312,28 @@ function renderLog() {
     filter !== 'all' ? entries.filter(e => e.team === filter) : entries;
     
   const tb = document.getElementById('logBody');
+  let pgControl = document.getElementById('paginationControl');
+  
   if (!data.length) {
     tb.innerHTML = `<tr><td colspan="7"><div class="empty"><div class="eicon">🤖</div><p>Belum ada data check-in terdaftar.</p></div></td></tr>`;
+    if (pgControl) pgControl.style.display = 'none';
     return;
   }
   
-  tb.innerHTML = data.map(e => {
+  const isAllTab = (filter === 'all');
+  const itemsPerPage = isAllTab ? rowsPerPage : data.length;
+  const totalPages = Math.ceil(data.length / itemsPerPage);
+  
+  if (currentPage > totalPages) currentPage = totalPages;
+  if (currentPage < 1) currentPage = 1;
+  
+  let pagedData = data;
+  if (isAllTab && data.length > itemsPerPage) {
+    const start = (currentPage - 1) * itemsPerPage;
+    pagedData = data.slice(start, start + itemsPerPage);
+  }
+  
+  tb.innerHTML = pagedData.map(e => {
     const tk = String(e.team || '').split(' ')[0];
     const tls = Array.isArray(e.tools) ? e.tools.join(', ') : e.tools;
     return `
@@ -2221,6 +2348,24 @@ function renderLog() {
       </tr>
     `;
   }).join('');
+  
+  if (isAllTab && totalPages > 1) {
+    if (!pgControl) {
+      const div = document.createElement('div');
+      div.id = 'paginationControl';
+      div.className = 'pagination-control';
+      document.getElementById('logBody').closest('.tbl-wrap').after(div);
+      pgControl = div;
+    }
+    pgControl.style.display = 'flex';
+    pgControl.innerHTML = `
+      <button class="header-btn" onclick="changePage(-1)" ${currentPage === 1 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>&laquo; Prev</button>
+      <span style="font-size:12px;color:var(--muted2);font-weight:600">Hal ${currentPage} dari ${totalPages} (${data.length} data)</span>
+      <button class="header-btn" onclick="changePage(1)" ${currentPage === totalPages ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Next &raquo;</button>
+    `;
+  } else {
+    if (pgControl) pgControl.style.display = 'none';
+  }
 }
 
 function renderLeaderboard() {
